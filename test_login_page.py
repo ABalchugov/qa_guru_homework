@@ -31,7 +31,7 @@ class TestSuite:
         login_button = self.driver.find_element(*self.LOGIN_BUTTON_LOCATOR)
         login_button.click()
 
-    # Логин с валидной парой логин-пароль
+    # Тест логина с валидной парой логин-пароль
     def valid_login_and_password(self):
         try:
             # Открытие страницы
@@ -61,7 +61,7 @@ class TestSuite:
         finally:
             self.tear_down()
 
-    # Логин с невалидной парой логин-пароль
+    # Тест логина с невалидной парой логин-пароль
     def invalid_login_and_password(self):
         try:
             # Открытие страницы
@@ -91,8 +91,70 @@ class TestSuite:
         finally:
             self.tear_down()
 
+    # Тест на короткий логин
+    def short_login(self):
+        try:
+            # Открытие страницы
+            self.set_up()
+
+            # Поиск элементов и заполнение полей
+            # Находим поле Логин по его ID и вводим текст
+            self._find_field_and_send_keys(self.LOGIN_LOCATOR, "a")
+
+            # Находим поле Пароль по его ID и вводим текст
+            self._find_field_and_send_keys(self.PASSWORD_LOCATOR, "password1")
+
+            time.sleep(5)
+
+            # Находим кнопку Логин по ее ID и кликаем
+            self._push_login_button()
+
+            # Проверка результата
+            time.sleep(5)  # Пауза, чтобы увидеть результат отправки
+
+            # Находим блок с отправленными данными
+            result_box = self.driver.find_element(*self.ERROR_MESSAGE_LOCATOR)
+
+            # Проверяем, что в блоке результата появился введенный текст
+            assert "Login must be at least 3 characters" in result_box.text
+            print("Тест формы авторизации с коротким логином успешно пройден!")
+        finally:
+            self.tear_down()
+
+    # Тест на короткий пароль
+    def short_password(self):
+        try:
+            # Открытие страницы
+            self.set_up()
+
+            # Поиск элементов и заполнение полей
+            # Находим поле Логин по его ID и вводим текст
+            self._find_field_and_send_keys(self.LOGIN_LOCATOR, "user1")
+
+            # Находим поле Пароль по его ID и вводим текст
+            self._find_field_and_send_keys(self.PASSWORD_LOCATOR, "a")
+
+            time.sleep(5)
+
+            # Находим кнопку Логин по ее ID и кликаем
+            self._push_login_button()
+
+            # Проверка результата
+            time.sleep(5)  # Пауза, чтобы увидеть результат отправки
+
+            # Находим блок с отправленными данными
+            result_box = self.driver.find_element(*self.ERROR_MESSAGE_LOCATOR)
+
+            # Проверяем, что в блоке результата появился введенный текст
+            assert "Password must be at least 6 characters" in result_box.text
+            print("Тест формы авторизации с коротким паролем успешно пройден!")
+        finally:
+            self.tear_down()
+
 
 test_suite = TestSuite()
 
 test_suite.valid_login_and_password()
 test_suite.invalid_login_and_password()
+test_suite.short_login()
+test_suite.short_password()
