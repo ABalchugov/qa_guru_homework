@@ -1,6 +1,9 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 
 class TestSuite:
@@ -18,7 +21,7 @@ class TestSuite:
         self.driver = webdriver.Chrome()
         self.driver.get("https://qa-guru.github.io/one-page-form/text-box.html")
         self.driver.maximize_window()
-        time.sleep(5)
+        self.driver.implicitly_wait(5)
 
     def tear_down(self):
         self.driver.quit()
@@ -31,8 +34,15 @@ class TestSuite:
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         submit_button.click()
 
-    def _find_result_box(self):
-        return self.driver.find_element(*self.RESULT_BOX_LOCATOR)
+    def _wait_result_box(self):
+        wait = WebDriverWait(
+            self.driver,
+            timeout=10,
+            poll_frequency=0.5,
+            ignored_exceptions=[NoSuchElementException, StaleElementReferenceException]
+        )
+
+        return wait.until(EC.visibility_of_element_located(self.RESULT_BOX_LOCATOR))
 
     # Тест поля FullName
     def test_full_name(self):
@@ -53,8 +63,8 @@ class TestSuite:
             # Проверка результата
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
-            # Находим блок с отправленными данными
-            result_box = self._find_result_box()
+            # Ожидание появления блока с результатами (id="output")
+            result_box = self._wait_result_box()
 
             # Проверяем, что в блоке результата появился введенный текст
             assert "Александр Александров" in result_box.text
@@ -82,7 +92,7 @@ class TestSuite:
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
             # Находим блок с отправленными данными
-            result_box = self._find_result_box()
+            result_box = self._wait_result_box()
 
             # Проверяем, что в блоке результата появился введенный текст
             assert "alexandrexample.com" not in result_box.text
@@ -113,7 +123,7 @@ class TestSuite:
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
             # Находим блок с отправленными данными
-            result_box = self._find_result_box()
+            result_box = self._wait_result_box()
 
             # Проверяем, что в блоке результата появился введенный текст
             assert "Москва, Петровка, 38" in result_box.text
@@ -144,7 +154,7 @@ class TestSuite:
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
             # Находим блок с отправленными данными
-            result_box = self._find_result_box()
+            result_box = self._wait_result_box()
 
             # Проверяем, что в блоке результата появился введенный текст
             assert "Москва, Б. Лубянка, 2" in result_box.text

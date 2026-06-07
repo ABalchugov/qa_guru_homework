@@ -1,6 +1,9 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 
 class TestSuite:
@@ -18,7 +21,7 @@ class TestSuite:
         self.driver = webdriver.Chrome()
         self.driver.get("https://qa-guru.github.io/one-page-form/login.html")
         self.driver.maximize_window()
-        time.sleep(5)
+        self.driver.implicitly_wait(5)
 
     def tear_down(self):
         self.driver.quit()
@@ -53,7 +56,14 @@ class TestSuite:
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
             # Находим блок с отправленными данными
-            result_box = self.driver.find_element(*self.WELCOME_MESSAGE_LOCATOR)
+            wait = WebDriverWait(
+                self.driver,
+                timeout=10,
+                poll_frequency=0.5,
+                ignored_exceptions=[NoSuchElementException, StaleElementReferenceException]
+            )
+
+            result_box = wait.until(EC.visibility_of_element_located(self.WELCOME_MESSAGE_LOCATOR))
 
             # Проверяем, что в блоке результата появился введенный текст
             assert "Welcome, user1!" in result_box.text
