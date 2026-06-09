@@ -15,6 +15,20 @@ class TestRegistration:
     GENDER_OTHER_LOCATOR = (By.CSS_SELECTOR, "label[for='gender-radio-3']")
     MOBILE_LOCATOR = (By.ID, "userNumber")
     DATE_OF_BIRTH_LOCATOR = (By.ID, "dateOfBirthInput")
+    MONTHS_LOCATORS = {
+        "January" : (By.XPATH, "//option[@value='0']"),
+        "February": (By.XPATH, "//option[@value='1']"),
+        "March": (By.XPATH, "//option[@value='2']"),
+        "April": (By.XPATH, "//option[@value='3']"),
+        "May": (By.XPATH, "//option[@value='4']"),
+        "June": (By.XPATH, "//option[@value='5']"),
+        "July": (By.XPATH, "//option[@value='6']"),
+        "August": (By.XPATH, "//option[@value='7']"),
+        "September": (By.XPATH, "//option[@value='8']"),
+        "October": (By.XPATH, "//option[@value='9']"),
+        "November": (By.XPATH, "//option[@value='10']"),
+        "December": (By.XPATH, "//option[@value='11']"),
+    }
     SUBJECTS_LOCATOR = (By.ID, "subjectsInput")
     HOBBIES_SPORTS_LOCATOR = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-1']")
     HOBBIES_READING_LOCATOR = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-2']")
@@ -40,6 +54,11 @@ class TestRegistration:
     def tear_down(self):
         self.driver.quit()
 
+    def close_popup(self):
+        self.wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
+        close_banner_btn = self.wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
+        close_banner_btn.click()
+
     def _find_field_and_send_keys(self, locator, key):
         field = self.driver.find_element(*locator)
         field.send_keys(key)
@@ -48,14 +67,27 @@ class TestRegistration:
         gender_label = self.wait.until(EC.element_to_be_clickable(locator))
         gender_label.click()
 
+    def choose_date_of_birth(self, month, year, day):
+        date_input = self.driver.find_element(*self.DATE_OF_BIRTH_LOCATOR)
+        date_input.click()
+        self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "react-datepicker__month-container")))
+        #Выбор месяца
+        month_select = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "react-datepicker__month-select")))
+        month_select.click()
+        month_select.find_element(*self.MONTHS_LOCATORS[month]).click()
+        #Выбор года
+        year_select = self.driver.find_element(By.CLASS_NAME, "react-datepicker__year-select")
+        year_select.click()
+        year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
+        #Выбор дня
+        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
+        day_element.click()
+
     def _push_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         submit_button.click()
 
-    def close_popup(self):
-        self.wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
-        close_banner_btn = self.wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
-        close_banner_btn.click()
+
 
     #Тест формы со всеми заполненными полями и валидными данными
     def all_fields_valid(self):
@@ -68,6 +100,7 @@ class TestRegistration:
             self._find_field_and_send_keys(self.USER_EMAIL_LOCATOR, "JWick@gmail.com")
             self.click_on_gender(self.GENDER_MALE_LOCATOR)
             self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
+            self.choose_date_of_birth("July", 1994, "020")
             time.sleep(5)
 
         finally:
