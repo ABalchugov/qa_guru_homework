@@ -1,9 +1,11 @@
 import time
+import os
+import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 
 class TestRegistration:
@@ -83,6 +85,17 @@ class TestRegistration:
         day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
         day_element.click()
 
+    def choose_subjects(self, subject):
+        subjects_input = self.wait.until(EC.element_to_be_clickable(self.SUBJECTS_LOCATOR))
+        subjects_input.send_keys(subject)
+        subjects_input.send_keys(Keys.ENTER)
+
+    def choose_hobbies(self, locator):
+        hobby = self.wait.until(
+            EC.element_to_be_clickable(locator)
+        )
+        hobby.click()
+
     def _push_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         submit_button.click()
@@ -101,6 +114,9 @@ class TestRegistration:
             self.click_on_gender(self.GENDER_MALE_LOCATOR)
             self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
             self.choose_date_of_birth("July", 1994, "020")
+            self.choose_subjects("Maths")
+            self.choose_subjects("Physics")
+            self.choose_hobbies(self.HOBBIES_SPORTS_LOCATOR)
             time.sleep(5)
 
         finally:
