@@ -1,6 +1,5 @@
 import time
 import os
-import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -41,6 +40,8 @@ class TestRegistration:
     CITY_LOCATOR = (By.ID, "city")
     SUBMIT_BUTTON_LOCATOR = (By.ID, "submit")
     POPUP_CLOSE_BUTTON = (By.XPATH, """//*[@id="fixedban"]/div/div/button""")
+    MODAL_TITLE = (By.ID, "example-modal-sizes-title-lg")
+    RESULT_TABLE = (By.CLASS_NAME, "table-responsive")
 
     def __init__(self):
         self.driver = None
@@ -54,6 +55,8 @@ class TestRegistration:
 
 
     def tear_down(self):
+        if os.path.exists("test_image.jpg"):
+            os.remove("test_image.jpg")
         self.driver.quit()
 
     def close_popup(self):
@@ -96,9 +99,34 @@ class TestRegistration:
         )
         hobby.click()
 
-    def _push_submit_button(self):
+    def picture_upload(self):
+        temp_file_path = os.path.abspath("test_image.jpg")
+        with open(temp_file_path, "w") as f:
+            f.write("fake image data")
+
+        upload_input = self.driver.find_element(*self.PICTURE_LOCATOR)
+        upload_input.send_keys(temp_file_path)
+
+    def scroll(self):
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.driver.execute_script("document.getElementsByTagName('footer')[0].style.display='none';")
+
+    def choose_state(self, state_id):
+        state_dropdown = self.wait.until(EC.element_to_be_clickable(self.STATE_LOCATOR))
+        state_dropdown.click()
+        state_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
+        state_option.click()
+
+    def choose_city(self, city_id):
+        city_dropdown = self.wait.until(EC.element_to_be_clickable(self.CITY_LOCATOR))
+        city_dropdown.click()
+        city_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
+        city_option.click()
+
+
+    def push_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
-        submit_button.click()
+        self.driver.execute_script("arguments[0].click();", submit_button)
 
 
 
@@ -110,13 +138,36 @@ class TestRegistration:
             self.close_popup()
             self._find_field_and_send_keys(self.FIRST_NAME_LOCATOR, "John")
             self._find_field_and_send_keys(self.LAST_NAME_LOCATOR, "Wick")
-            self._find_field_and_send_keys(self.USER_EMAIL_LOCATOR, "JWick@gmail.com")
+            self._find_field_and_send_keys(self.USER_EMAIL_LOCATOR, "JWick@someemail.com")
             self.click_on_gender(self.GENDER_MALE_LOCATOR)
             self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
             self.choose_date_of_birth("July", 1994, "020")
             self.choose_subjects("Maths")
             self.choose_subjects("Physics")
             self.choose_hobbies(self.HOBBIES_SPORTS_LOCATOR)
+            self.picture_upload()
+            self._find_field_and_send_keys(self.CURRENT_ADDRESS_LOCATOR, "Ягодная, д.1")
+            self.scroll()
+            self.choose_state(state_id=2)
+            self.choose_city(city_id=3)
+            self.push_submit_button()
+
+            #Проверка открытия модального окна
+            modal_title = self.wait.until(EC.visibility_of_element_located(self.MODAL_TITLE))
+            assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
+            # Проверяем наличие валидных данных в таблице результатов
+            result_table = self.driver.find_element(*self.RESULT_TABLE)
+            assert "John" in result_table.text, "Имя 'John' не найдено в таблице результатов"
+            assert "Wick" in result_table.text, "Фамилия 'Wick' не найдена в таблице результатов"
+            assert "JWick@someemail.com" in result_table.text, "Email 'JWick@someemail.com' не найден в таблице результатов"
+            assert "Male" in result_table.text, "Пол 'Male' не найден в таблице результатов"
+            assert "8005553535" in result_table.text, "Телефон '8005553535' не найден в таблице результатов"
+            assert "Maths" in result_table.text, "Предмет 'Maths' не найден в таблице результатов"
+            assert "Physics" in result_table.text, "Предмет 'Physics' не найден в таблице результатов"
+            assert "Sports" in result_table.text, "Хобби 'Sports' не найдено в таблице результатов"
+            assert "test_image.jpg" in result_table.text, "Файл 'test_image.jpg' не найден в таблице результатов"
+            assert "Ягодная, д.1" in result_table.text, "Адрес 'Ягодная, д.1' не найден в таблице результатов"
+            print("✅ Все проверки успешно пройдены!")
             time.sleep(5)
 
         finally:
