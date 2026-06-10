@@ -85,8 +85,7 @@ class TestRegistration:
         year_select.click()
         year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
         # Выбор дня
-        day_element = self.driver.find_element(By.CSS_SELECTOR,
-                                               f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
+        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
         day_element.click()
 
     def choose_subjects(self, subject):
