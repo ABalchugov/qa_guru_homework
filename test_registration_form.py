@@ -165,7 +165,7 @@ class TestRegistration:
             assert "Sports" in result_table.text, "Хобби 'Sports' не найдено в таблице результатов"
             assert "test_image.jpg" in result_table.text, "Файл 'test_image.jpg' не найден в таблице результатов"
             assert "Ягодная, д.1" in result_table.text, "Адрес 'Ягодная, д.1' не найден в таблице результатов"
-            print("✅ Все проверки успешно пройдены!")
+            print("Все проверки успешно пройдены!")
             time.sleep(5)
 
         finally:
