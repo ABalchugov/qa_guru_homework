@@ -17,7 +17,7 @@ class TestRegistration:
     MOBILE_LOCATOR = (By.ID, "userNumber")
     DATE_OF_BIRTH_LOCATOR = (By.ID, "dateOfBirthInput")
     MONTHS_LOCATORS = {
-        "January" : (By.XPATH, "//option[@value='0']"),
+        "January": (By.XPATH, "//option[@value='0']"),
         "February": (By.XPATH, "//option[@value='1']"),
         "March": (By.XPATH, "//option[@value='2']"),
         "April": (By.XPATH, "//option[@value='3']"),
@@ -53,14 +53,14 @@ class TestRegistration:
         self.driver.maximize_window()
         self.wait = WebDriverWait(self.driver, 5)
 
-
     def tear_down(self):
         if os.path.exists("test_image.jpg"):
             os.remove("test_image.jpg")
         self.driver.quit()
 
     def close_popup(self):
-        self.wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
+        self.wait.until(
+            EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
         close_banner_btn = self.wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
         close_banner_btn.click()
 
@@ -76,16 +76,17 @@ class TestRegistration:
         date_input = self.driver.find_element(*self.DATE_OF_BIRTH_LOCATOR)
         date_input.click()
         self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "react-datepicker__month-container")))
-        #Выбор месяца
+        # Выбор месяца
         month_select = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "react-datepicker__month-select")))
         month_select.click()
         month_select.find_element(*self.MONTHS_LOCATORS[month]).click()
-        #Выбор года
+        # Выбор года
         year_select = self.driver.find_element(By.CLASS_NAME, "react-datepicker__year-select")
         year_select.click()
         year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
-        #Выбор дня
-        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
+        # Выбор дня
+        day_element = self.driver.find_element(By.CSS_SELECTOR,
+                                               f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
         day_element.click()
 
     def choose_subjects(self, subject):
@@ -114,23 +115,22 @@ class TestRegistration:
     def choose_state(self, state_id):
         state_dropdown = self.wait.until(EC.element_to_be_clickable(self.STATE_LOCATOR))
         state_dropdown.click()
-        state_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
+        state_option = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
         state_option.click()
 
     def choose_city(self, city_id):
         city_dropdown = self.wait.until(EC.element_to_be_clickable(self.CITY_LOCATOR))
         city_dropdown.click()
-        city_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
+        city_option = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
         city_option.click()
-
 
     def push_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         self.driver.execute_script("arguments[0].click();", submit_button)
 
-
-
-    #Тест формы со всеми заполненными полями и валидными данными
+    # Тест формы со всеми заполненными полями и валидными данными
     def all_fields_valid(self):
         try:
             self.set_up()
@@ -139,20 +139,23 @@ class TestRegistration:
             self._find_field_and_send_keys(self.FIRST_NAME_LOCATOR, "John")
             self._find_field_and_send_keys(self.LAST_NAME_LOCATOR, "Wick")
             self._find_field_and_send_keys(self.USER_EMAIL_LOCATOR, "JWick@someemail.com")
+            time.sleep(2)
             self.click_on_gender(self.GENDER_MALE_LOCATOR)
             self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
             self.choose_date_of_birth("July", 1994, "020")
             self.choose_subjects("Maths")
             self.choose_subjects("Physics")
             self.choose_hobbies(self.HOBBIES_SPORTS_LOCATOR)
+            time.sleep(2)
             self.picture_upload()
             self._find_field_and_send_keys(self.CURRENT_ADDRESS_LOCATOR, "Ягодная, д.1")
             self.scroll()
             self.choose_state(state_id=2)
             self.choose_city(city_id=3)
+            time.sleep(2)
             self.push_submit_button()
 
-            #Проверка открытия модального окна
+            # Проверка открытия модального окна
             modal_title = self.wait.until(EC.visibility_of_element_located(self.MODAL_TITLE))
             assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
             # Проверяем наличие валидных данных в таблице результатов
@@ -172,6 +175,7 @@ class TestRegistration:
 
         finally:
             self.tear_down()
+
 
 test = TestRegistration()
 test.all_fields_valid()
