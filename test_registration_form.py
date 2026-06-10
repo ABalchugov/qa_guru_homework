@@ -94,9 +94,7 @@ class TestRegistration:
         subjects_input.send_keys(Keys.ENTER)
 
     def choose_hobbies(self, locator):
-        hobby = self.wait.until(
-            EC.element_to_be_clickable(locator)
-        )
+        hobby = self.wait.until(EC.element_to_be_clickable(locator))
         hobby.click()
 
     def picture_upload(self):
