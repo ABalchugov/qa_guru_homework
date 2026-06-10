@@ -114,15 +114,13 @@ class TestRegistration:
     def choose_state(self, state_id):
         state_dropdown = self.wait.until(EC.element_to_be_clickable(self.STATE_LOCATOR))
         state_dropdown.click()
-        state_option = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
+        state_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
         state_option.click()
 
     def choose_city(self, city_id):
         city_dropdown = self.wait.until(EC.element_to_be_clickable(self.CITY_LOCATOR))
         city_dropdown.click()
-        city_option = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
+        city_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
         city_option.click()
 
     def push_submit_button(self):
