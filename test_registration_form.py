@@ -85,7 +85,7 @@ class TestRegistration:
         year_select.click()
         year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
         # Выбор дня
-        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--{day}:not(.react-datepicker__day--outside-month)")
+        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--0{day}:not(.react-datepicker__day--outside-month)")
         day_element.click()
 
     def choose_subjects(self, subject):
@@ -137,7 +137,7 @@ class TestRegistration:
             time.sleep(2)
             self.click_on_gender(self.GENDER_MALE_LOCATOR)
             self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
-            self.choose_date_of_birth("July", 1994, "020")
+            self.choose_date_of_birth("July", 1994, 20)
             self.choose_subjects("Maths")
             self.choose_subjects("Physics")
             self.choose_hobbies(self.HOBBIES_SPORTS_LOCATOR)
