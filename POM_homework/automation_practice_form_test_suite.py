@@ -25,10 +25,12 @@ class AutomationPracticeFormTestSuite:
                                                    ("Sports", "Music"),
                                                    "г. Санкт-Петербург, ул. Невский проспект, д 101", "NCR", "Noida")
         self.automation_practice_form.assert_result_is_displayed()
-        self.automation_practice_form.assert_result_data(self.tmp_file_name, "Dmitry", "Bugaev", "bugaev@example.com", "Male",
-                                                  "1234567890", ("1988", "4", "22"), ("Maths", "English"),
-                                                  ("Sports", "Music"),
-                                                  "г. Санкт-Петербург, ул. Невский проспект, д 101", "NCR", "Noida")
+        self.automation_practice_form.assert_result_data(self.tmp_file_name, "Dmitry", "Bugaev", "bugaev@example.com",
+                                                         "Male",
+                                                         "1234567890", ("1988", "4", "22"), ("Maths", "English"),
+                                                         ("Sports", "Music"),
+                                                         "г. Санкт-Петербург, ул. Невский проспект, д 101", "NCR",
+                                                         "Noida")
         test_suite.tear_down()
 
     def test_form_positive02(self):
@@ -40,10 +42,10 @@ class AutomationPracticeFormTestSuite:
                                                    "г. Челябинск, Кирова, 3", "NCR", "Noida")
         self.automation_practice_form.assert_result_is_displayed()
         self.automation_practice_form.assert_result_data(self.tmp_file_name, "Alexandr", "Balchugov",
-                                                  "balchugov@someemail.com", "Male",
-                                                  "8005553535", ("1994", "7", "20"), ("Physics", "English"),
-                                                  ("Sports", "Music"),
-                                                  "г. Челябинск, Кирова, 3", "NCR", "Noida")
+                                                         "balchugov@someemail.com", "Male",
+                                                         "8005553535", ("1994", "7", "20"), ("Physics", "English"),
+                                                         ("Sports", "Music"),
+                                                         "г. Челябинск, Кирова, 3", "NCR", "Noida")
         test_suite.tear_down()
 
     def tear_down(self):

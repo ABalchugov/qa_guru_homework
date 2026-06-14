@@ -144,8 +144,9 @@ class AutomationPracticeFormPO:
         self._select_city(city)
         self._click_submit_button()
 
-    def assert_result_data(self, file_name=None, first_name=None, last_name=None, email=None, gender=None, user_number=None,
-                    birth_day=None, subjects=None, hobbies=None, current_address=None, state=None, city=None):
+    def assert_result_data(self, file_name=None, first_name=None, last_name=None, email=None, gender=None,
+                           user_number=None,
+                           birth_day=None, subjects=None, hobbies=None, current_address=None, state=None, city=None):
         result_form = self.wait.until(ec.visibility_of_element_located(self.RESULT_FORM))
         result_text = result_form.text
 
@@ -174,4 +175,3 @@ class AutomationPracticeFormPO:
 
     def tear_down(self):
         self.driver.quit()
-
