@@ -17,7 +17,7 @@ class CalendarElementPO:
     YEAR_OF_BIRTH_SELECT = (By.CSS_SELECTOR, ".react-datepicker__year-select")
     MONTH_OF_BIRTH_SELECT = (By.CSS_SELECTOR, ".react-datepicker__month-select")
 
-    def select_birth_day_1(self, date: Tuple[str, str, str]):
+    def select_birth_day(self, date: Tuple[str, str, str]):
         self.driver.find_element(*self.CALENDAR_INPUT).click()
         Select(self.driver.find_element(*self.YEAR_OF_BIRTH_SELECT)).select_by_value(date[0])
         Select(self.driver.find_element(*self.MONTH_OF_BIRTH_SELECT)).select_by_value(date[1])
@@ -80,7 +80,7 @@ class AutomationPracticeFormPO:
     # Календарь переместил в отдельный класс
     def _select_birth_day(self, date: Tuple[str, str, str]):
         calendar_element = CalendarElementPO(self.driver)
-        calendar_element.select_birth_day_1(date)
+        calendar_element.select_birth_day(date)
 
     def _upload_file(self, file_path):
         self.driver.find_element(*self.UPLOAD_PICTURE_BUTTON).send_keys(file_path)
@@ -144,12 +144,9 @@ class AutomationPracticeFormPO:
         self._select_city(city)
         self._click_submit_button()
 
-    # TODO: со временем вынести в тесты или создать несколько разных методов assert под нужды разных тестов
-    def assert_form(self, file_name=None, first_name=None, last_name=None, email=None, gender=None, user_number=None,
+    def assert_result_data(self, file_name=None, first_name=None, last_name=None, email=None, gender=None, user_number=None,
                     birth_day=None, subjects=None, hobbies=None, current_address=None, state=None, city=None):
         result_form = self.wait.until(ec.visibility_of_element_located(self.RESULT_FORM))
-        assert result_form.is_displayed(), "Таблица с данным не отобразилась"
-
         result_text = result_form.text
 
         expected_data = {
@@ -170,6 +167,10 @@ class AutomationPracticeFormPO:
             if isinstance(value, tuple):
                 value = value[0]
             assert key in result_text and value in result_text, f"Значения {value} из строки {key} не совпадают!"
+
+    def assert_result_is_displayed(self):
+        result_form = self.wait.until(ec.visibility_of_element_located(self.RESULT_FORM))
+        assert result_form.is_displayed(), "Таблица с данным не отобразилась"
 
     def tear_down(self):
         self.driver.quit()
