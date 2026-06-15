@@ -11,29 +11,11 @@ class TestRegistration:
     FIRST_NAME_LOCATOR = (By.ID, "firstName")
     LAST_NAME_LOCATOR = (By.ID, "lastName")
     USER_EMAIL_LOCATOR = (By.ID, "userEmail")
-    GENDER_MALE_LOCATOR = (By.CSS_SELECTOR, "label[for='gender-radio-1']")
-    GENDER_FEMALE_LOCATOR = (By.CSS_SELECTOR, "label[for='gender-radio-2']")
-    GENDER_OTHER_LOCATOR = (By.CSS_SELECTOR, "label[for='gender-radio-3']")
+    GENDERS_LOCATOR = (By.ID, "genterWrapper")
     MOBILE_LOCATOR = (By.ID, "userNumber")
     DATE_OF_BIRTH_LOCATOR = (By.ID, "dateOfBirthInput")
-    MONTHS_LOCATORS = {
-        "January": (By.XPATH, "//option[@value='0']"),
-        "February": (By.XPATH, "//option[@value='1']"),
-        "March": (By.XPATH, "//option[@value='2']"),
-        "April": (By.XPATH, "//option[@value='3']"),
-        "May": (By.XPATH, "//option[@value='4']"),
-        "June": (By.XPATH, "//option[@value='5']"),
-        "July": (By.XPATH, "//option[@value='6']"),
-        "August": (By.XPATH, "//option[@value='7']"),
-        "September": (By.XPATH, "//option[@value='8']"),
-        "October": (By.XPATH, "//option[@value='9']"),
-        "November": (By.XPATH, "//option[@value='10']"),
-        "December": (By.XPATH, "//option[@value='11']"),
-    }
     SUBJECTS_LOCATOR = (By.ID, "subjectsInput")
-    HOBBIES_SPORTS_LOCATOR = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-1']")
-    HOBBIES_READING_LOCATOR = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-2']")
-    HOBBIES_MUSIC_LOCATOR = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-3']")
+    HOBBIES_LOCATOR = (By.ID, "hobbiesWrapper")
     PICTURE_LOCATOR = (By.ID, "uploadPicture")
     CURRENT_ADDRESS_LOCATOR = (By.ID, "currentAddress")
     STATE_LOCATOR = (By.ID, "state")
@@ -64,13 +46,17 @@ class TestRegistration:
         close_banner_btn = self.wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
         close_banner_btn.click()
 
-    def _find_field_and_send_keys(self, locator, key):
+    def _find_input(self, locator):
         field = self.driver.find_element(*locator)
+        return field
+
+    def _fill_input(self, field, key):
         field.send_keys(key)
 
-    def click_on_gender(self, locator):
-        gender_label = self.wait.until(EC.element_to_be_clickable(locator))
-        gender_label.click()
+    def click_on_gender(self, value):
+        gender_wrapper = self.wait.until(EC.element_to_be_clickable(self.GENDERS_LOCATOR))
+        gender = gender_wrapper.find_element(By.XPATH, f"//*[@value='{value}']")
+        gender.click()
 
     def choose_date_of_birth(self, month, year, day):
         date_input = self.driver.find_element(*self.DATE_OF_BIRTH_LOCATOR)
@@ -79,13 +65,14 @@ class TestRegistration:
         # Выбор месяца
         month_select = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "react-datepicker__month-select")))
         month_select.click()
-        month_select.find_element(*self.MONTHS_LOCATORS[month]).click()
+        month_select.find_element(By.XPATH, f"//option[@value='{month - 1}']").click()
         # Выбор года
         year_select = self.driver.find_element(By.CLASS_NAME, "react-datepicker__year-select")
         year_select.click()
         year_select.find_element(By.XPATH, f"//option[@value='{year}']").click()
         # Выбор дня
-        day_element = self.driver.find_element(By.CSS_SELECTOR, f".react-datepicker__day--0{day}:not(.react-datepicker__day--outside-month)")
+        day_element = self.driver.find_element(By.CSS_SELECTOR,
+                                               f".react-datepicker__day--0{day}:not(.react-datepicker__day--outside-month)")
         day_element.click()
 
     def choose_subjects(self, subject):
@@ -93,12 +80,13 @@ class TestRegistration:
         subjects_input.send_keys(subject)
         subjects_input.send_keys(Keys.ENTER)
 
-    def choose_hobbies(self, locator):
-        hobby = self.wait.until(EC.element_to_be_clickable(locator))
+    def choose_hobbies(self, value):
+        hobbies_wrapper = self.wait.until(EC.element_to_be_clickable(self.HOBBIES_LOCATOR))
+        hobby = hobbies_wrapper.find_element(By.XPATH, f"//*[@value='{value}']")
         hobby.click()
 
-    def picture_upload(self):
-        temp_file_path = os.path.abspath("test_image.jpg")
+    def picture_upload(self, path):
+        temp_file_path = os.path.abspath(path)
         with open(temp_file_path, "w") as f:
             f.write("fake image data")
 
@@ -109,16 +97,18 @@ class TestRegistration:
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.driver.execute_script("document.getElementsByTagName('footer')[0].style.display='none';")
 
-    def choose_state(self, state_id):
+    def choose_state(self, state):
         state_dropdown = self.wait.until(EC.element_to_be_clickable(self.STATE_LOCATOR))
         state_dropdown.click()
-        state_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{state_id}]""")))
+        state_wrapper = self.wait.until(EC.element_to_be_clickable((By.ID, "stateCity-wrapper")))
+        state_option = state_wrapper.find_element(By.XPATH, f".//*[text()='{state}']")
         state_option.click()
 
-    def choose_city(self, city_id):
+    def choose_city(self, city):
         city_dropdown = self.wait.until(EC.element_to_be_clickable(self.CITY_LOCATOR))
         city_dropdown.click()
-        city_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"""//*[@id="stateCity-wrapper"]/div[{city_id}]""")))
+        city_wrapper = self.wait.until(EC.element_to_be_clickable((By.ID, "stateCity-wrapper")))
+        city_option = city_wrapper.find_element(By.XPATH, f".//*[text()='{city}']")
         city_option.click()
 
     def push_submit_button(self):
@@ -127,26 +117,43 @@ class TestRegistration:
 
     # Тест формы со всеми заполненными полями и валидными данными
     def all_fields_valid(self):
+        expected_values = {
+            "first_name": "John",
+            "last_name": "Wick",
+            "user_email": "JWick@someemail.com",
+            "gender": "Male",
+            "mobile": "8005553535",
+            "month_of_birth": 7,
+            "day_of_birth": 20,
+            "year_of_birth": 1994,
+            "subject": "Maths",
+            "hobby": "Sports",
+            "picture_path": "test_image.jpg",
+            "current_address": "Ягодная, д.1",
+            "state": "NCR",
+            "city": "Gurgaon"
+        }
+
         try:
             self.set_up()
             time.sleep(2)
             self.close_popup()
-            self._find_field_and_send_keys(self.FIRST_NAME_LOCATOR, "John")
-            self._find_field_and_send_keys(self.LAST_NAME_LOCATOR, "Wick")
-            self._find_field_and_send_keys(self.USER_EMAIL_LOCATOR, "JWick@someemail.com")
+            self._fill_input(self._find_input(self.FIRST_NAME_LOCATOR), expected_values["first_name"])
+            self._fill_input(self._find_input(self.LAST_NAME_LOCATOR), expected_values["last_name"])
+            self._fill_input(self._find_input(self.USER_EMAIL_LOCATOR), expected_values["user_email"])
             time.sleep(2)
-            self.click_on_gender(self.GENDER_MALE_LOCATOR)
-            self._find_field_and_send_keys(self.MOBILE_LOCATOR, "8005553535")
-            self.choose_date_of_birth("July", 1994, 20)
-            self.choose_subjects("Maths")
-            self.choose_subjects("Physics")
-            self.choose_hobbies(self.HOBBIES_SPORTS_LOCATOR)
+            self.click_on_gender(expected_values["gender"])
+            self._fill_input(self._find_input(self.MOBILE_LOCATOR), expected_values["mobile"])
+            self.choose_date_of_birth(expected_values["month_of_birth"], expected_values["year_of_birth"],
+                                      expected_values["day_of_birth"])
+            self.choose_subjects(expected_values["subject"])
+            self.choose_hobbies(expected_values["hobby"])
             time.sleep(2)
-            self.picture_upload()
-            self._find_field_and_send_keys(self.CURRENT_ADDRESS_LOCATOR, "Ягодная, д.1")
+            self.picture_upload(expected_values["picture_path"])
+            self._fill_input(self._find_input(self.CURRENT_ADDRESS_LOCATOR), expected_values["current_address"])
             self.scroll()
-            self.choose_state(state_id=2)
-            self.choose_city(city_id=3)
+            self.choose_state(expected_values["state"])
+            self.choose_city(expected_values["city"])
             time.sleep(2)
             self.push_submit_button()
 
@@ -155,16 +162,28 @@ class TestRegistration:
             assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
             # Проверяем наличие валидных данных в таблице результатов
             result_table = self.driver.find_element(*self.RESULT_TABLE)
-            assert "John" in result_table.text, "Имя 'John' не найдено в таблице результатов"
-            assert "Wick" in result_table.text, "Фамилия 'Wick' не найдена в таблице результатов"
-            assert "JWick@someemail.com" in result_table.text, "Email 'JWick@someemail.com' не найден в таблице результатов"
-            assert "Male" in result_table.text, "Пол 'Male' не найден в таблице результатов"
-            assert "8005553535" in result_table.text, "Телефон '8005553535' не найден в таблице результатов"
-            assert "Maths" in result_table.text, "Предмет 'Maths' не найден в таблице результатов"
-            assert "Physics" in result_table.text, "Предмет 'Physics' не найден в таблице результатов"
-            assert "Sports" in result_table.text, "Хобби 'Sports' не найдено в таблице результатов"
-            assert "test_image.jpg" in result_table.text, "Файл 'test_image.jpg' не найден в таблице результатов"
-            assert "Ягодная, д.1" in result_table.text, "Адрес 'Ягодная, д.1' не найден в таблице результатов"
+            assert expected_values[
+                       "first_name"] in result_table.text, f"Имя {expected_values["first_name"]} не найдено в таблице результатов"
+            assert expected_values[
+                       "last_name"] in result_table.text, f"Фамилия {expected_values["last_name"]} не найдена в таблице результатов"
+            assert expected_values[
+                       "user_email"] in result_table.text, f"Email {expected_values["user_email"]} не найден в таблице результатов"
+            assert expected_values[
+                       "gender"] in result_table.text, f"Пол {expected_values["gender"]} не найден в таблице результатов"
+            assert expected_values[
+                       "mobile"] in result_table.text, f"Телефон {expected_values["mobile"]} не найден в таблице результатов"
+            assert expected_values[
+                       "subject"] in result_table.text, f"Предмет {expected_values["subject"]} не найден в таблице результатов"
+            assert expected_values[
+                       "hobby"] in result_table.text, f"Хобби {expected_values["hobby"]} не найдено в таблице результатов"
+            assert expected_values[
+                       "picture_path"] in result_table.text, f"Файл {expected_values["picture_path"]} не найден в таблице результатов"
+            assert expected_values[
+                       "current_address"] in result_table.text, f"Адрес {expected_values["current_address"]} не найден в таблице результатов"
+            assert expected_values[
+                       "state"] in result_table.text, f"Адрес {expected_values["state"]} не найден в таблице результатов"
+            assert expected_values[
+                       "city"] in result_table.text, f"Адрес {expected_values["city"]} не найден в таблице результатов"
             print("Все проверки успешно пройдены!")
             time.sleep(5)
 
