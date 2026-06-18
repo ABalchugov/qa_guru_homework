@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 
 
 class TestRegistration:
@@ -42,8 +42,8 @@ class TestRegistration:
 
     def close_popup(self):
         self.wait.until(
-            EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
-        close_banner_btn = self.wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
+            ec.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Level up your automation')]")))
+        close_banner_btn = self.wait.until(ec.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
         close_banner_btn.click()
 
     def _find_input(self, locator):
@@ -54,16 +54,16 @@ class TestRegistration:
         field.send_keys(key)
 
     def click_on_gender(self, value):
-        gender_wrapper = self.wait.until(EC.element_to_be_clickable(self.GENDERS_LOCATOR))
+        gender_wrapper = self.wait.until(ec.element_to_be_clickable(self.GENDERS_LOCATOR))
         gender = gender_wrapper.find_element(By.XPATH, f"//*[@value='{value}']")
         gender.click()
 
     def choose_date_of_birth(self, month, year, day):
         date_input = self.driver.find_element(*self.DATE_OF_BIRTH_LOCATOR)
         date_input.click()
-        self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "react-datepicker__month-container")))
+        self.wait.until(ec.visibility_of_element_located((By.CLASS_NAME, "react-datepicker__month-container")))
         # Выбор месяца
-        month_select = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "react-datepicker__month-select")))
+        month_select = self.wait.until(ec.element_to_be_clickable((By.CLASS_NAME, "react-datepicker__month-select")))
         month_select.click()
         month_select.find_element(By.XPATH, f"//option[@value='{month - 1}']").click()
         # Выбор года
@@ -76,12 +76,12 @@ class TestRegistration:
         day_element.click()
 
     def choose_subjects(self, subject):
-        subjects_input = self.wait.until(EC.element_to_be_clickable(self.SUBJECTS_LOCATOR))
+        subjects_input = self.wait.until(ec.element_to_be_clickable(self.SUBJECTS_LOCATOR))
         subjects_input.send_keys(subject)
         subjects_input.send_keys(Keys.ENTER)
 
     def choose_hobbies(self, value):
-        hobbies_wrapper = self.wait.until(EC.element_to_be_clickable(self.HOBBIES_LOCATOR))
+        hobbies_wrapper = self.wait.until(ec.element_to_be_clickable(self.HOBBIES_LOCATOR))
         hobby = hobbies_wrapper.find_element(By.XPATH, f"//*[@value='{value}']")
         hobby.click()
 
@@ -98,16 +98,16 @@ class TestRegistration:
         self.driver.execute_script("document.getElementsByTagName('footer')[0].style.display='none';")
 
     def choose_state(self, state):
-        state_dropdown = self.wait.until(EC.element_to_be_clickable(self.STATE_LOCATOR))
+        state_dropdown = self.wait.until(ec.element_to_be_clickable(self.STATE_LOCATOR))
         state_dropdown.click()
-        state_wrapper = self.wait.until(EC.element_to_be_clickable((By.ID, "stateCity-wrapper")))
+        state_wrapper = self.wait.until(ec.element_to_be_clickable((By.ID, "stateCity-wrapper")))
         state_option = state_wrapper.find_element(By.XPATH, f".//*[text()='{state}']")
         state_option.click()
 
     def choose_city(self, city):
-        city_dropdown = self.wait.until(EC.element_to_be_clickable(self.CITY_LOCATOR))
+        city_dropdown = self.wait.until(ec.element_to_be_clickable(self.CITY_LOCATOR))
         city_dropdown.click()
-        city_wrapper = self.wait.until(EC.element_to_be_clickable((By.ID, "stateCity-wrapper")))
+        city_wrapper = self.wait.until(ec.element_to_be_clickable((By.ID, "stateCity-wrapper")))
         city_option = city_wrapper.find_element(By.XPATH, f".//*[text()='{city}']")
         city_option.click()
 
@@ -158,7 +158,7 @@ class TestRegistration:
             self.push_submit_button()
 
             # Проверка открытия модального окна
-            modal_title = self.wait.until(EC.visibility_of_element_located(self.MODAL_TITLE))
+            modal_title = self.wait.until(ec.visibility_of_element_located(self.MODAL_TITLE))
             assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
             # Проверяем наличие валидных данных в таблице результатов
             result_table = self.driver.find_element(*self.RESULT_TABLE)
