@@ -46,12 +46,25 @@ class TestRegistration:
         close_banner_btn = self.wait.until(ec.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
         close_banner_btn.click()
 
-    def _find_input(self, locator):
-        field = self.driver.find_element(*locator)
-        return field
+    def fill_first_name(self, name):
+        field = self.driver.find_element(*self.FIRST_NAME_LOCATOR)
+        field.send_keys(name)
 
-    def _fill_input(self, field, key):
-        field.send_keys(key)
+    def fill_last_name(self, last_name):
+        field = self.driver.find_element(*self.LAST_NAME_LOCATOR)
+        field.send_keys(last_name)
+
+    def fill_email(self,email):
+        field = self.driver.find_element(*self.USER_EMAIL_LOCATOR)
+        field.send_keys(email)
+
+    def fill_mobile(self,mobile_number):
+        field = self.driver.find_element(*self.MOBILE_LOCATOR)
+        field.send_keys(mobile_number)
+
+    def fill_current_address(self,current_address):
+        field = self.driver.find_element(*self.CURRENT_ADDRESS_LOCATOR)
+        field.send_keys(current_address)
 
     def click_on_gender(self, value):
         gender_wrapper = self.wait.until(ec.element_to_be_clickable(self.GENDERS_LOCATOR))
@@ -111,79 +124,65 @@ class TestRegistration:
         city_option = city_wrapper.find_element(By.XPATH, f".//*[text()='{city}']")
         city_option.click()
 
-    def push_submit_button(self):
+    def click_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         self.driver.execute_script("arguments[0].click();", submit_button)
 
     # Тест формы со всеми заполненными полями и валидными данными
     def all_fields_valid(self):
-        expected_values = {
-            "first_name": "John",
-            "last_name": "Wick",
-            "user_email": "JWick@someemail.com",
-            "gender": "Male",
-            "mobile": "8005553535",
-            "month_of_birth": 7,
-            "day_of_birth": 20,
-            "year_of_birth": 1994,
-            "subject": "Maths",
-            "hobby": "Sports",
-            "picture_path": "test_image.jpg",
-            "current_address": "Ягодная, д.1",
-            "state": "NCR",
-            "city": "Gurgaon"
-        }
+        first_name = "John"
+        last_name = "Wick"
+        user_email = "JWick@someemail.com"
+        gender = "Male"
+        mobile = "8005553535"
+        month_of_birth = 7
+        day_of_birth = 20
+        year_of_birth = 1994
+        subject = "Maths"
+        hobby = "Sports"
+        picture_path = "test_image.jpg"
+        current_address = "Ягодная, д.1"
+        state = "NCR"
+        city = "Gurgaon"
 
         try:
             self.set_up()
             time.sleep(2)
             self.close_popup()
-            self._fill_input(self._find_input(self.FIRST_NAME_LOCATOR), expected_values["first_name"])
-            self._fill_input(self._find_input(self.LAST_NAME_LOCATOR), expected_values["last_name"])
-            self._fill_input(self._find_input(self.USER_EMAIL_LOCATOR), expected_values["user_email"])
+            self.fill_first_name(first_name)
+            self.fill_last_name(last_name)
+            self.fill_email(user_email)
             time.sleep(2)
-            self.click_on_gender(expected_values["gender"])
-            self._fill_input(self._find_input(self.MOBILE_LOCATOR), expected_values["mobile"])
-            self.choose_date_of_birth(expected_values["month_of_birth"], expected_values["year_of_birth"],
-                                      expected_values["day_of_birth"])
-            self.choose_subjects(expected_values["subject"])
-            self.choose_hobbies(expected_values["hobby"])
+            self.click_on_gender(gender)
+            self.fill_mobile(mobile)
+            self.choose_date_of_birth(month_of_birth, year_of_birth,day_of_birth)
+            self.choose_subjects(subject)
+            self.choose_hobbies(hobby)
             time.sleep(2)
-            self.picture_upload(expected_values["picture_path"])
-            self._fill_input(self._find_input(self.CURRENT_ADDRESS_LOCATOR), expected_values["current_address"])
+            self.picture_upload(picture_path)
+            self.fill_current_address(current_address)
             self.scroll()
-            self.choose_state(expected_values["state"])
-            self.choose_city(expected_values["city"])
+            self.choose_state(state)
+            self.choose_city(city)
             time.sleep(2)
-            self.push_submit_button()
+            self.click_submit_button()
 
             # Проверка открытия модального окна
             modal_title = self.wait.until(ec.visibility_of_element_located(self.MODAL_TITLE))
             assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
             # Проверяем наличие валидных данных в таблице результатов
             result_table = self.driver.find_element(*self.RESULT_TABLE)
-            assert expected_values[
-                       "first_name"] in result_table.text, f"Имя {expected_values["first_name"]} не найдено в таблице результатов"
-            assert expected_values[
-                       "last_name"] in result_table.text, f"Фамилия {expected_values["last_name"]} не найдена в таблице результатов"
-            assert expected_values[
-                       "user_email"] in result_table.text, f"Email {expected_values["user_email"]} не найден в таблице результатов"
-            assert expected_values[
-                       "gender"] in result_table.text, f"Пол {expected_values["gender"]} не найден в таблице результатов"
-            assert expected_values[
-                       "mobile"] in result_table.text, f"Телефон {expected_values["mobile"]} не найден в таблице результатов"
-            assert expected_values[
-                       "subject"] in result_table.text, f"Предмет {expected_values["subject"]} не найден в таблице результатов"
-            assert expected_values[
-                       "hobby"] in result_table.text, f"Хобби {expected_values["hobby"]} не найдено в таблице результатов"
-            assert expected_values[
-                       "picture_path"] in result_table.text, f"Файл {expected_values["picture_path"]} не найден в таблице результатов"
-            assert expected_values[
-                       "current_address"] in result_table.text, f"Адрес {expected_values["current_address"]} не найден в таблице результатов"
-            assert expected_values[
-                       "state"] in result_table.text, f"Адрес {expected_values["state"]} не найден в таблице результатов"
-            assert expected_values[
-                       "city"] in result_table.text, f"Адрес {expected_values["city"]} не найден в таблице результатов"
+            assert first_name in result_table.text, f"Имя {first_name} не найдено в таблице результатов"
+            assert last_name in result_table.text, f"Фамилия {last_name} не найдена в таблице результатов"
+            assert user_email in result_table.text, f"Email {user_email} не найден в таблице результатов"
+            assert gender in result_table.text, f"Пол {gender} не найден в таблице результатов"
+            assert mobile in result_table.text, f"Телефон {mobile} не найден в таблице результатов"
+            assert subject in result_table.text, f"Предмет {subject} не найден в таблице результатов"
+            assert hobby in result_table.text, f"Хобби {hobby} не найдено в таблице результатов"
+            assert picture_path in result_table.text, f"Файл {picture_path} не найден в таблице результатов"
+            assert current_address in result_table.text, f"Адрес {current_address} не найден в таблице результатов"
+            assert state in result_table.text, f"Адрес {state} не найден в таблице результатов"
+            assert city in result_table.text, f"Адрес {city} не найден в таблице результатов"
             print("Все проверки успешно пройдены!")
             time.sleep(5)
 
