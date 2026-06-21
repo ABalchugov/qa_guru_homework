@@ -5,6 +5,25 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+from dataclasses import dataclass
+
+
+@dataclass
+class UserData:
+    first_name = "John"
+    last_name = "Wick"
+    user_email = "JWick@someemail.com"
+    gender = "Male"
+    mobile = "8005553535"
+    month_of_birth = 7
+    day_of_birth = 20
+    year_of_birth = 1994
+    subject = "Maths"
+    hobby = "Sports"
+    picture_path = "test_image.jpg"
+    current_address = "Ягодная, д.1"
+    state = "NCR"
+    city = "Gurgaon"
 
 
 class TestRegistration:
@@ -54,15 +73,15 @@ class TestRegistration:
         field = self.driver.find_element(*self.LAST_NAME_LOCATOR)
         field.send_keys(last_name)
 
-    def fill_email(self,email):
+    def fill_email(self, email):
         field = self.driver.find_element(*self.USER_EMAIL_LOCATOR)
         field.send_keys(email)
 
-    def fill_mobile(self,mobile_number):
+    def fill_mobile(self, mobile_number):
         field = self.driver.find_element(*self.MOBILE_LOCATOR)
         field.send_keys(mobile_number)
 
-    def fill_current_address(self,current_address):
+    def fill_current_address(self, current_address):
         field = self.driver.find_element(*self.CURRENT_ADDRESS_LOCATOR)
         field.send_keys(current_address)
 
@@ -130,40 +149,27 @@ class TestRegistration:
 
     # Тест формы со всеми заполненными полями и валидными данными
     def all_fields_valid(self):
-        first_name = "John"
-        last_name = "Wick"
-        user_email = "JWick@someemail.com"
-        gender = "Male"
-        mobile = "8005553535"
-        month_of_birth = 7
-        day_of_birth = 20
-        year_of_birth = 1994
-        subject = "Maths"
-        hobby = "Sports"
-        picture_path = "test_image.jpg"
-        current_address = "Ягодная, д.1"
-        state = "NCR"
-        city = "Gurgaon"
+        user = UserData()
 
         try:
             self.set_up()
             time.sleep(2)
             self.close_popup()
-            self.fill_first_name(first_name)
-            self.fill_last_name(last_name)
-            self.fill_email(user_email)
+            self.fill_first_name(user.first_name)
+            self.fill_last_name(user.last_name)
+            self.fill_email(user.user_email)
             time.sleep(2)
-            self.click_on_gender(gender)
-            self.fill_mobile(mobile)
-            self.choose_date_of_birth(month_of_birth, year_of_birth,day_of_birth)
-            self.choose_subjects(subject)
-            self.choose_hobbies(hobby)
+            self.click_on_gender(user.gender)
+            self.fill_mobile(user.mobile)
+            self.choose_date_of_birth(user.month_of_birth, user.year_of_birth, user.day_of_birth)
+            self.choose_subjects(user.subject)
+            self.choose_hobbies(user.hobby)
             time.sleep(2)
-            self.picture_upload(picture_path)
-            self.fill_current_address(current_address)
+            self.picture_upload(user.picture_path)
+            self.fill_current_address(user.current_address)
             self.scroll()
-            self.choose_state(state)
-            self.choose_city(city)
+            self.choose_state(user.state)
+            self.choose_city(user.city)
             time.sleep(2)
             self.click_submit_button()
 
@@ -172,17 +178,17 @@ class TestRegistration:
             assert modal_title.text == "Thanks for submitting the form", "Модальное окно не открылось"
             # Проверяем наличие валидных данных в таблице результатов
             result_table = self.driver.find_element(*self.RESULT_TABLE)
-            assert first_name in result_table.text, f"Имя {first_name} не найдено в таблице результатов"
-            assert last_name in result_table.text, f"Фамилия {last_name} не найдена в таблице результатов"
-            assert user_email in result_table.text, f"Email {user_email} не найден в таблице результатов"
-            assert gender in result_table.text, f"Пол {gender} не найден в таблице результатов"
-            assert mobile in result_table.text, f"Телефон {mobile} не найден в таблице результатов"
-            assert subject in result_table.text, f"Предмет {subject} не найден в таблице результатов"
-            assert hobby in result_table.text, f"Хобби {hobby} не найдено в таблице результатов"
-            assert picture_path in result_table.text, f"Файл {picture_path} не найден в таблице результатов"
-            assert current_address in result_table.text, f"Адрес {current_address} не найден в таблице результатов"
-            assert state in result_table.text, f"Адрес {state} не найден в таблице результатов"
-            assert city in result_table.text, f"Адрес {city} не найден в таблице результатов"
+            assert user.first_name in result_table.text, f"Имя {user.first_name} не найдено в таблице результатов"
+            assert user.last_name in result_table.text, f"Фамилия {user.last_name} не найдена в таблице результатов"
+            assert user.user_email in result_table.text, f"Email {user.user_email} не найден в таблице результатов"
+            assert user.gender in result_table.text, f"Пол {user.gender} не найден в таблице результатов"
+            assert user.mobile in result_table.text, f"Телефон {user.mobile} не найден в таблице результатов"
+            assert user.subject in result_table.text, f"Предмет {user.subject} не найден в таблице результатов"
+            assert user.hobby in result_table.text, f"Хобби {user.hobby} не найдено в таблице результатов"
+            assert user.picture_path in result_table.text, f"Файл {user.picture_path} не найден в таблице результатов"
+            assert user.current_address in result_table.text, f"Адрес {user.current_address} не найден в таблице результатов"
+            assert user.state in result_table.text, f"Адрес {user.state} не найден в таблице результатов"
+            assert user.city in result_table.text, f"Адрес {user.city} не найден в таблице результатов"
             print("Все проверки успешно пройдены!")
             time.sleep(5)
 
