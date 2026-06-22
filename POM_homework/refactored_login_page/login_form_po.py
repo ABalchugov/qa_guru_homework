@@ -27,18 +27,22 @@ class LoginFormPO:
     def tear_down(self):
         self.driver.quit()
 
-    def _find_field_and_send_keys(self, locator, key):
-        field = self.driver.find_element(*locator)
-        field.send_keys(key)
+    def _fill_login_field(self, login):
+        field = self.driver.find_element(*self.LOGIN_LOCATOR)
+        field.send_keys(login)
 
-    def _push_login_button(self):
+    def _fill_password_field(self, password):
+        field = self.driver.find_element(*self.PASSWORD_LOCATOR)
+        field.send_keys(password)
+
+    def _click_login_button(self):
         login_button = self.driver.find_element(*self.LOGIN_BUTTON_LOCATOR)
         login_button.click()
 
     def fill_form(self, login, password):
-        self._find_field_and_send_keys(self.LOGIN_LOCATOR, login)
-        self._find_field_and_send_keys(self.PASSWORD_LOCATOR, password)
-        self._push_login_button()
+        self._fill_login_field(login)
+        self._fill_password_field(password)
+        self._click_login_button()
 
     def assert_welcome_msg_is_displayed(self):
         result_form = self.wait.until(ec.visibility_of_element_located(self.WELCOME_MESSAGE_LOCATOR))
