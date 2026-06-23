@@ -2,8 +2,8 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
 
 
 class TestSuite:
@@ -16,9 +16,16 @@ class TestSuite:
 
     def __init__(self):
         self.driver = None
+        self.wait = None
 
     def set_up(self):
         self.driver = webdriver.Chrome()
+        self.wait = WebDriverWait(
+            self.driver,
+            timeout=10,
+            poll_frequency=0.5,
+            ignored_exceptions=[NoSuchElementException, StaleElementReferenceException]
+        )
         self.driver.get("https://qa-guru.github.io/one-page-form/text-box.html")
         self.driver.maximize_window()
         self.driver.implicitly_wait(5)
@@ -26,23 +33,28 @@ class TestSuite:
     def tear_down(self):
         self.driver.quit()
 
-    def _find_field_and_send_keys(self, locator, key):
-        field = self.driver.find_element(*locator)
-        field.send_keys(key)
+    def _fill_full_name_field(self, name):
+        field = self.driver.find_element(*self.FULL_NAME_LOCATOR)
+        field.send_keys(name)
 
-    def _push_submit_button(self):
+    def _fill_email_field(self, email):
+        field = self.driver.find_element(*self.EMAIL_LOCATOR)
+        field.send_keys(email)
+
+    def _fill_current_address_field(self, current_address):
+        field = self.driver.find_element(*self.CURRENT_ADDRESS_LOCATOR)
+        field.send_keys(current_address)
+
+    def _fill_permanent_address_field(self, permanent_address):
+        field = self.driver.find_element(*self.PERMANENT_ADDRESS_LOCATOR)
+        field.send_keys(permanent_address)
+
+    def _click_submit_button(self):
         submit_button = self.driver.find_element(*self.SUBMIT_BUTTON_LOCATOR)
         submit_button.click()
 
     def _wait_result_box(self):
-        wait = WebDriverWait(
-            self.driver,
-            timeout=10,
-            poll_frequency=0.5,
-            ignored_exceptions=[NoSuchElementException, StaleElementReferenceException]
-        )
-
-        return wait.until(EC.visibility_of_element_located(self.RESULT_BOX_LOCATOR))
+        return self.wait.until(ec.visibility_of_element_located(self.RESULT_BOX_LOCATOR))
 
     # Тест поля FullName
     def test_full_name(self):
@@ -52,13 +64,13 @@ class TestSuite:
 
             # Поиск элементов и заполнение полей
             # Находим поле Full Name по его ID и вводим текст
-            self._find_field_and_send_keys(self.FULL_NAME_LOCATOR, "Александр Александров")
+            self._fill_full_name_field("Александр Александров")
 
             # Находим поле Email по его ID и вводим текст
-            self._find_field_and_send_keys(self.EMAIL_LOCATOR, "alexandr@example.com")
+            self._fill_email_field("alexandr@example.com")
 
             # Находим кнопку Submit по ее ID и кликаем
-            self._push_submit_button()
+            self._click_submit_button()
 
             # Проверка результата
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
@@ -80,22 +92,26 @@ class TestSuite:
 
             # Поиск элементов и заполнение полей
             # Находим поле Full Name по его ID и вводим текст
-            self._find_field_and_send_keys(self.FULL_NAME_LOCATOR, "Александр Александров")
+            self._fill_full_name_field("Александр Александров")
 
             # Находим поле Email по его ID и вводим текст
-            self._find_field_and_send_keys(self.EMAIL_LOCATOR, "alexandrexample.com")
+            self._fill_email_field("alexandrexample.com")
 
             # Находим кнопку Submit по ее ID и кликаем
-            self._push_submit_button()
+            self._click_submit_button()
 
             # Проверка результата
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
             # Находим блок с отправленными данными
-            result_box = self._wait_result_box()
+            result_box = None
+            try:
+                result_box = self._wait_result_box()
+            except TimeoutException:
+                pass
 
             # Проверяем, что в блоке результата появился введенный текст
-            assert "alexandrexample.com" not in result_box.text
+            assert result_box is None
             print("Негативный тест поля Email успешно пройден!")
         finally:
             test_suite.tear_down()
@@ -108,17 +124,16 @@ class TestSuite:
 
             # Поиск элементов и заполнение полей
             # Находим поле Full Name по его ID и вводим текст
-            self._find_field_and_send_keys(self.FULL_NAME_LOCATOR, "Александр Александров")
+            self._fill_full_name_field("Александр Александров")
 
             # Находим поле Email по его ID и вводим текст
-            self._find_field_and_send_keys(self.EMAIL_LOCATOR, "alexandr@example.com")
+            self._fill_email_field("alexandr@example.com")
 
             # Находим поле Current Address по его ID и вводим текст
-            self._find_field_and_send_keys(self.CURRENT_ADDRESS_LOCATOR, "Москва, Петровка, 38")
+            self._fill_current_address_field("Москва, Петровка, 38")
 
             # Находим кнопку Submit по ее ID и кликаем
-            self._push_submit_button()
-
+            self._click_submit_button()
             # Проверка результата
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
 
@@ -139,16 +154,16 @@ class TestSuite:
 
             # Поиск элементов и заполнение полей
             # Находим поле Full Name по его ID и вводим текст
-            self._find_field_and_send_keys(self.FULL_NAME_LOCATOR, "Александр Александров")
+            self._fill_full_name_field("Александр Александров")
 
             # Находим поле Email по его ID и вводим текст
-            self._find_field_and_send_keys(self.EMAIL_LOCATOR, "alexandr@example.com")
+            self._fill_email_field("alexandr@example.com")
 
             # Находим поле Permanent Address по его ID и вводим текст
-            self._find_field_and_send_keys(self.PERMANENT_ADDRESS_LOCATOR, "Москва, Б. Лубянка, 2")
+            self._fill_permanent_address_field("Москва, Б. Лубянка, 2")
 
             # Находим кнопку Submit по ее ID и кликаем
-            self._push_submit_button()
+            self._click_submit_button()
 
             # Проверка результата
             time.sleep(5)  # Пауза, чтобы увидеть результат отправки
