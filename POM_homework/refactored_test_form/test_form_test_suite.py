@@ -1,18 +1,22 @@
 from POM_homework.refactored_test_form import test_form_po
 from test_data import UserData
+from selenium import webdriver
 
 
 class TestFormTestSuite:
 
     def __init__(self):
+        self.driver = None
         self.test_form = None
 
     def setup(self):
-        self.test_form = test_form_po.TestFormPO("https://qa-guru.github.io/one-page-form/text-box.html")
-        self.test_form.setup()
+        self.driver = webdriver.Chrome()
+        self.driver.maximize_window()
+        self.driver.get("https://qa-guru.github.io/one-page-form/text-box.html")
+        self.test_form = test_form_po.TestFormPO(self.driver)
 
     def tear_down(self):
-        self.test_form.tear_down()
+        self.driver.quit()
 
     def test_full_name(self):
         try:
