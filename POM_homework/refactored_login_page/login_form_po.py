@@ -1,4 +1,3 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
@@ -12,37 +11,26 @@ class LoginFormPO:
     WELCOME_MESSAGE_LOCATOR = (By.ID, "welcome-message")
     LOGOUT_BUTTON_LOCATOR = (By.ID, "logout-button")
 
-    def __init__(self, url):
-        self.driver = None
-        self.wait = None
-        self.url = url
-
-    def setup(self):
-        self.driver = webdriver.Chrome()
-        self.driver.implicitly_wait = 5
-        self.driver.maximize_window()
+    def __init__(self, driver):
+        self.driver = driver
         self.wait = WebDriverWait(self.driver, 5)
-        self.driver.get(self.url)
 
-    def tear_down(self):
-        self.driver.quit()
-
-    def _fill_login_field(self, login):
+    def fill_login_field(self, login):
         field = self.driver.find_element(*self.LOGIN_LOCATOR)
         field.send_keys(login)
 
-    def _fill_password_field(self, password):
+    def fill_password_field(self, password):
         field = self.driver.find_element(*self.PASSWORD_LOCATOR)
         field.send_keys(password)
 
-    def _click_login_button(self):
+    def click_login_button(self):
         login_button = self.driver.find_element(*self.LOGIN_BUTTON_LOCATOR)
         login_button.click()
 
     def fill_form(self, login, password):
-        self._fill_login_field(login)
-        self._fill_password_field(password)
-        self._click_login_button()
+        self.fill_login_field(login)
+        self.fill_password_field(password)
+        self.click_login_button()
 
     def assert_welcome_msg_is_displayed(self):
         result_form = self.wait.until(ec.visibility_of_element_located(self.WELCOME_MESSAGE_LOCATOR))

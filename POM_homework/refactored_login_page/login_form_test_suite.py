@@ -1,17 +1,20 @@
 import login_form_po
+from selenium import webdriver
 
 
 class LoginFormTestSuite:
     def __init__(self):
+        self.driver = None
         self.login_form = None
 
     def setup(self):
-        self.login_form = login_form_po.LoginFormPO(
-            "https://qa-guru.github.io/one-page-form/login.html")
-        self.login_form.setup()
+        self.driver = webdriver.Chrome()
+        self.driver.maximize_window()
+        self.driver.get("https://qa-guru.github.io/one-page-form/login.html")
+        self.login_form = login_form_po.LoginFormPO(self.driver)
 
     def tear_down(self):
-        self.login_form.tear_down()
+        self.driver.quit()
 
     # Тест логина с валидной парой логин-пароль
     def valid_login_and_password(self):
