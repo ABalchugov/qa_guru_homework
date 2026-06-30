@@ -1,5 +1,5 @@
 from seleniumpagefactory.Pagefactory import PageFactory
-
+from seleniumpagefactory.Pagefactory import ElementNotVisibleException
 
 class FormPage(PageFactory):
 
@@ -48,7 +48,10 @@ class FormPage(PageFactory):
             self.fill_permanent_address_field(permanent_address)
 
     def get_result_data(self):
-        if not self.result_box_locator.is_displayed():
+        try:
+            if not self.result_box_locator.is_displayed():
+                return None
+        except ElementNotVisibleException:
             return None
 
         name = self.result_box_name_locator.text.replace("Name:", "").strip()
