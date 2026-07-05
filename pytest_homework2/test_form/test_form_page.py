@@ -1,10 +1,15 @@
 import time
 import pytest
+import allure
 from selenium.webdriver.common.by import By
 
 from form_page import FormPage
 
-
+@allure.epic("UI Automation")
+@allure.feature("Text Box Form")
+@allure.story("Успешная отправка формы")
+@allure.title("Отправка формы с корректными данными")
+@allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.smoke
 @pytest.mark.regress
 @pytest.mark.parametrize("name, email, current_address, permanent_address", [
@@ -28,7 +33,10 @@ def test_positive_form_submission(driver, name, email, current_address, permanen
     assert output["current_address"] == current_address.strip()
     assert output["permanent_address"] == permanent_address.strip()
 
-
+@allure.feature("Форма Text Box")
+@allure.story("Частичное заполнение формы")
+@allure.title("Отправка формы с заполненными не всеми полями")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.regress
 @pytest.mark.parametrize("name, email, current_address, permanent_address", [
     ("Only Name", "", "", ""),
@@ -50,7 +58,10 @@ def test_partial_form_submission(driver, name, email, current_address, permanent
     if current_address: assert output["current_address"] == current_address
     if permanent_address: assert output["permanent_address"] == permanent_address
 
-
+@allure.feature("Валидация формы")
+@allure.story("Проверка email")
+@allure.title("Отображение ошибки при вводе некорректного email")
+@allure.severity(allure.severity_level.CRITICAL)
 @pytest.mark.smoke
 @pytest.mark.regress
 @pytest.mark.parametrize("invalid_email", [
@@ -73,7 +84,10 @@ def test_invalid_email_validation(driver, invalid_email):
     time.sleep(1)
     assert output is None or form_po.is_email_error_present(), f"Email '{invalid_email}' не должен быть принят системой"
 
-
+@allure.feature("Граничные значения")
+@allure.story("Проверка длинных строк")
+@allure.title("Отправка формы с максимально длинными значениями")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.regress
 @pytest.mark.parametrize("field_type, long_string", [
     ("name", "A" * 1000),  # Экстремально длинное имя
@@ -91,7 +105,10 @@ def test_long_input_fields(driver, field_type, long_string):
     output = form_po.get_result_data()
     assert output is not None, f"Форма не справилась с длинной строкой в поле {field_type}"
 
-
+@allure.feature("Безопасность")
+@allure.story("Защита от XSS и HTML-инъекций")
+@allure.title("Обработка потенциально опасного ввода")
+@allure.severity(allure.severity_level.BLOCKER)
 @pytest.mark.regress
 @pytest.mark.parametrize("security_payload", [
     "<script>alert('xss')</script>",  # Базовый XSS скрипт
@@ -119,7 +136,10 @@ def test_security_and_special_inputs(driver, security_payload):
 
     assert "<script>" not in output_html.lower()
 
-
+@allure.feature("Форма Text Box")
+@allure.story("Отправка пустой формы")
+@allure.title("Отправка формы без заполнения полей")
+@allure.severity(allure.severity_level.MINOR)
 @pytest.mark.smoke
 @pytest.mark.regress
 def test_empty_form_submission(driver):
